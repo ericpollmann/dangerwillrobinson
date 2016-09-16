@@ -2,14 +2,14 @@
 var map;
 
 // Query radius
-var radiusInKm = 2.5;
+var radiusInKm = 10;
 
 // Get a reference to the Firebase public transit open data set
 // var transitFirebaseRef = new Firebase("https://publicdata-transit.firebaseio.com/")
-var transitFirebaseRef = new Firebase("https://superfund-8d935.firebaseio.com/")
+var dangerFirebaseRef = new Firebase("https://superfund-8d935.firebaseio.com/")
 
-// Create a new GeoFire instance, pulling data from the public transit data
-var geoFire = new GeoFire(transitFirebaseRef.child("_geofire"));
+// Create a new GeoFire instance, pulling data from the public danger data
+var geoFire = new GeoFire(dangerFirebaseRef.child("_geofire"));
 
 // Query params parsed from url (see function at end)
 var urlParams;
@@ -46,7 +46,7 @@ var startQuery = function(e) {
     sitesInQuery[siteId] = true;
 
     // Look up the site's data
-    transitFirebaseRef.child("sites").child(siteId).once("value", function(dataSnapshot) {
+    dangerFirebaseRef.child("sites").child(siteId).once("value", function(dataSnapshot) {
       // Get the site data from the Open Data Set
       site = dataSnapshot.val();
 
@@ -98,32 +98,19 @@ function initializeMap(center) {
   // Create the Google Map
   map = new google.maps.Map(document.getElementById("map-canvas"), {
     center: loc,
-    zoom: 13,
+    zoom: 14,
     mapTypeId: google.maps.MapTypeId.ROADMAP
-  });
-
-  // Create a draggable circle centered on the map
-  var circle = new google.maps.Circle({
-    strokeColor: "#6D3099",
-    strokeOpacity: 0.7,
-    strokeWeight: 1,
-    fillColor: "#B650FF",
-    fillOpacity: 0.35,
-    map: map,
-    center: loc,
-    radius: ((radiusInKm) * 1000),
-    draggable: true
   });
 
   //Update the query's criteria every time the circle is dragged
   var updateCriteria = _.debounce(function() {
-    var latLng = circle.getCenter();
+    var latLng = map.getCenter();
     geoQuery.updateCriteria({
       center: [latLng.lat(), latLng.lng()],
       radius: radiusInKm
     });
   }, 10);
-  google.maps.event.addListener(circle, "drag", updateCriteria);
+  map.addListener("center_changed", updateCriteria);
 }
 
 /**********************/
