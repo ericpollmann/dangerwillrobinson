@@ -11,6 +11,9 @@ var transitFirebaseRef = new Firebase("https://superfund-8d935.firebaseio.com/")
 // Create a new GeoFire instance, pulling data from the public transit data
 var geoFire = new GeoFire(transitFirebaseRef.child("_geofire"));
 
+// Query params parsed from url (see function at end)
+var urlParams;
+
 /*************/
 /*  GEOQUERY */
 /*************/
@@ -19,7 +22,16 @@ var sitesInQuery = {};
 
 var geoQuery = null;
 var startQuery = function(e) {
-  defaultCenter = [37.3842209,-122.1142677];
+  var lat = parseFloat(urlParams.latitude);
+  if (isNaN(lat)) {
+    lat = 37.3842209;
+  }
+  var lon = parseFloat(urlParams.longitude);
+  if (isNaN(lon)) {
+    lon = -122.1142677;
+  }
+  
+  defaultCenter = [lat, lon];
   initializeMap(defaultCenter);
 
   // Create a new GeoQuery instance
@@ -163,3 +175,16 @@ google.maps.Marker.prototype.animatedMoveTo = function(newLocation) {
     }.bind(this), 50);
   }
 };
+
+// Query param parsing
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
