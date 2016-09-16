@@ -62,7 +62,7 @@ public class GeofenceActivity extends ActionBarActivity {
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // MY_PERMISSIONS_LOCATION is an
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }

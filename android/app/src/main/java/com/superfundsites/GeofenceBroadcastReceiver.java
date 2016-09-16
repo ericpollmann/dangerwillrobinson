@@ -26,11 +26,10 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Geofence action")
+                .setContentTitle("Warning: you're near a superfund site")
                 .setContentIntent(pendingIntent)
-                .setContentText(transition)
-                .setTicker("Geofence action")
-                .addAction(R.mipmap.ic_launcher, "View details", pendingIntent)
+//                .setContentText(transition)
+                .setTicker("Warning: you're near a superfund site")
                 .build();
 
         nm.notify(0, notification);

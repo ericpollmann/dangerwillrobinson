@@ -1,29 +1,50 @@
 package com.superfundsites;
 
+import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
+import android.webkit.WebView;
+
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
+import rx.Subscription;
+import rx.functions.Action1;
 
 public class DetailsActivity extends AppCompatActivity {
+
+    private static final String TAG = "Superfund";
+    private static final String BASE_URL = "https://superfund-8d935.firebaseapp.com/";
+    private ReactiveLocationProvider reactiveLocationProvider;
+    private Subscription lastKnownLocationSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        reactiveLocationProvider = new ReactiveLocationProvider(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        lastKnownLocationSubscription = reactiveLocationProvider
+                .getLastKnownLocation()
+                .subscribe(new Action1<Location>() {
+                    @Override
+                    public void call(Location location) {
+                        String url = String.format("%s?latitude=%s&longitude=%s", BASE_URL,
+                                location.getLatitude(), location.getLongitude());
+                        Log.d(TAG, "Displaying: " + url);
+                        WebView myWebView = (WebView) findViewById(R.id.webview);
+                        myWebView.getSettings().setJavaScriptEnabled(true);
+                        myWebView.loadUrl(url);
+                    }
+                });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        lastKnownLocationSubscription.unsubscribe();
+    }
 }
