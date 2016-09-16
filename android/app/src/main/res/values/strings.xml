@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Hazard</string>
+    <string name="title_activity_geofence">GeofenceActivity</string>
+    <string name="title_activity_details">DetailsActivity</string>
+</resources>
